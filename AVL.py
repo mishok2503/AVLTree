@@ -115,20 +115,21 @@ class AVLTree:
 			if node:
 				Print(node.l)
 				Print(node.r)
-				print(node.v)
+				print(node.v, node.h)
 		Print(self.head)
 
 
 if __name__ == '__main__':
 	tree = AVLTree()
-	for i in range(100):
+	for i in range(10):
 		tree.add(i)
-	print(tree.nth_element(64))
-	print(tree.min(), tree.max())
-	for i in range(15):
-		tree.delete(i)
-	print(tree.min(), tree.max())
-	for i in range(99, 80, -1):
-		tree.delete(i)
-	print(tree.min(), tree.max())
-	print(tree.nth_element(64))
+	tree.print();
+	# print(tree.nth_element(64))
+	# print(tree.min(), tree.max())
+	# for i in range(15):
+	# 	tree.delete(i)
+	# print(tree.min(), tree.max())
+	# for i in range(99, 80, -1):
+	# 	tree.delete(i)
+	# print(tree.min(), tree.max())
+	# print(tree.nth_element(64))
