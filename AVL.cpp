@@ -32,7 +32,6 @@ private:
     };
 
     Node* head = nullptr;
-    int size = 0;
 
     function<Node*(Node*)> _min = [&](Node* n) { return n->l ? _min(n->l) : n; };
     function<Node*(Node*)> _max = [&](Node* n) { return n->r ? _max(n->r) : n; };
@@ -83,12 +82,13 @@ public:
 
     void add(int v)
     {
-        ++size;
         function<Node*(Node*)> deep_add = [&](Node* node)
         {
             if (!node)
                 return new Node(v);
-            if (v >= node->v)
+            if (v == node->v)
+                return node;
+            if (v > node->v)
                 node->r = deep_add(node->r);
             else
                 node->l = deep_add(node->l);
@@ -99,9 +99,10 @@ public:
 
     void del(int v)
     {
-        --size;
         function<Node*(Node*)> deep_del = [&](Node* node)
         {
+            if (!node)
+                return node;
             if (v > node->v)
                 node->r = deep_del(node->r);
             else if (v < node->v)
@@ -132,8 +133,6 @@ public:
         };
         head = deep_del(head);
     }
-
-    int get_size() { return size; }
 
     int get_max() { return _max(head)->v;}
     int get_min() { return _min(head)->v;}
@@ -168,7 +167,7 @@ public:
 
     pair<bool, int> lower_bound(int v)
     {
-        if (v > get_max() || v < get_min())
+        if (!head || v > get_max())
             return {false, 0};
 
         auto less = [&](Node* a, Node* b)
@@ -187,6 +186,37 @@ public:
 
         return {true, lb(head)->v};
     }
+
+    pair<bool, int> down_bound(int v)
+    {
+        if (!head || v <= get_min())
+            return {false, 0};
+
+        auto less = [&](Node* a, Node* b)
+        {
+            if (!a || a->v >= v)
+                return b;
+            if (!b || b->v >= v)
+                return a;
+            return a->v > b->v ? a : b;
+        };
+
+        function<Node*(Node*)> lb = [&](Node* node)
+        {
+            return node ? less(node, lb(v > node->v ? node->r : node->l)) : node;
+        };
+
+        return {true, lb(head)->v};
+    }
+
+    bool exists(int v)
+    {
+        auto lb = lower_bound(v);
+        return lb.first && lb.second == v;
+    }
+
+    pair<bool, int> next(int v) { return lower_bound(v + 1); }
+    pair<bool, int> prev(int v) { return down_bound(v); }
 
     ~AVLTree()
     {
